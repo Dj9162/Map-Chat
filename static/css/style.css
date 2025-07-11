@@ -1,0 +1,128 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f7f9fc;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+.container {
+    display: flex;
+    height: 100%;
+}
+
+#map {
+    flex: 2;
+}
+
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #e0e6ed;
+    background-color: #ffffff;
+    box-shadow: -4px 0 8px rgba(0,0,0,0.08);
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+}
+
+#chat-window {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #ffffff;
+    font-size: 15px;
+    color: #34495e;
+    line-height: 1.6;
+}
+
+#chat-window div {
+    margin-bottom: 16px;
+}
+
+#chat-window b {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+#chat-input {
+    border: none;
+    padding: 15px;
+    font-size: 14px;
+    border-top: 1px solid #e0e6ed;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+}
+
+#send-btn {
+    padding: 12px;
+    cursor: pointer;
+    background-color: #5c6bc0;
+    color: #ffffff;
+    border: none;
+    transition: background-color 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+#send-btn:hover {
+    background-color: #3949ab;
+}
+
+#toggle-chat {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    background-color: #ff5e57;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+#toggle-chat:hover {
+    background-color: #e84118;
+}
+
+.show-chat-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 22px;
+    background-color: #5c6bc0;
+    color: #ffffff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    z-index: 1000;
+    font-family: 'Poppins', sans-serif;
+}
+
+.show-chat-btn:hover {
+    background-color: #3949ab;
+}
+
+.chat-container.hidden {
+    display: none;
+}
+
+#map.fullscreen {
+    flex: 1 0 100%;
+}
+/* Shift Leaflet search bar slightly left */
+.leaflet-control-geocoder {
+    right: 60px !important; /* Moves search bar to left */
+    left: auto !important;
+}
+
+/* Ensure three-bar button stays at top-right corner */
+.show-chat-btn {
+    z-index: 2000 !important;
+    right: 10px !important;
+}
