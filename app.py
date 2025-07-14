@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, session
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
+import openrouteservice
 
 load_dotenv()
 
@@ -59,6 +60,39 @@ def remove_location():
         return jsonify({"status": "removed", "removed": removed})
     else:
         return jsonify({"status": "error", "message": "Invalid index"}), 400
+
+
+# Add your OpenRouteService API key to .env
+ORS_API_KEY = os.getenv('ORS_API_KEY')
+ors_client = openrouteservice.Client(key=ORS_API_KEY)
+
+
+@app.route('/shortest-path', methods=['GET'])
+def shortest_path():
+    locations = session.get('locations', [])
+    if len(locations) < 2:
+        return jsonify({"status": "error", "message": "At least 2 locations required."}), 400
+
+    start = request.args.get('start', type=int)
+    if start is None or not (0 <= start < len(locations)):
+        return jsonify({
+            "status": "error",
+            "message": "Please specify a valid starting location."
+        }), 400
+
+    coords = [(float(loc['lng']), float(loc['lat'])) for loc in locations]
+
+    # Move the starting point to the front
+    coords.insert(0, coords.pop(start))
+
+    routes = ors_client.directions(
+        coordinates=coords,
+        profile='driving-car',
+        format='geojson',
+        optimize_waypoints=True
+    )
+
+    return jsonify({"status": "success", "geojson": routes})
 
 
 if __name__ == '__main__':

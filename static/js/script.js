@@ -46,13 +46,39 @@ document.getElementById('chat-input').addEventListener("keyup", function(event) 
 
 function sendMessage() {
     var input = document.getElementById('chat-input');
-    var message = input.value;
+    var message = input.value.trim();
     input.value = '';
 
-    if (!message.trim()) return;
+    if (!message) return;
 
     var chatWindow = document.getElementById('chat-window');
     chatWindow.innerHTML += `<div><b>You:</b> ${message}</div>`;
+
+    if (message.toLowerCase().includes('shortest path')) {
+        if (storedLocations.length < 2) {
+            chatWindow.innerHTML += `<div><b>Gemini:</b> Please select at least two locations.</div>`;
+            return;
+        }
+
+        let promptMessage = 'Please clearly specify your starting location by number:<br>';
+        storedLocations.forEach((loc, index) => {
+            promptMessage += `<button class="start-btn" data-index="${index}">${index + 1}. ${loc}</button><br>`;
+        });
+
+        chatWindow.innerHTML += `<div><b>Gemini:</b> ${promptMessage}</div>`;
+
+        document.querySelectorAll('.start-btn').forEach(button => {
+            button.onclick = function() {
+                var idx = parseInt(this.getAttribute('data-index'));
+                drawShortestPath(idx);
+                chatWindow.innerHTML += `<div><b>Gemini:</b> I've displayed the shortest route starting from "${storedLocations[idx]}" clearly on the map.</div>`;
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            };
+        });
+
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return;
+    }
 
     fetch('/chat', {
         method: 'POST',
@@ -61,11 +87,13 @@ function sendMessage() {
     })
     .then(res => res.json())
     .then(data => {
-        chatWindow.innerHTML += `<div><b>Map AI:</b> ${marked.parse(data.response)}</div>`;
+        chatWindow.innerHTML += `<div><b>Gemini:</b> ${marked.parse(data.response)}</div>`;
         chatWindow.scrollTop = chatWindow.scrollHeight;
     })
     .catch(err => console.error(err));
 }
+
+
 
 var markers = []; // to track map markers
 
@@ -122,3 +150,34 @@ document.getElementById('show-chat-btn').onclick = function() {
     this.style.display = 'none';
     map.invalidateSize(); // Leaflet resize fix
 };
+
+var pathLayer;
+
+function drawShortestPath(startIndex = 0) {
+    fetch(`/shortest-path?start=${startIndex}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            if (pathLayer) {
+                map.removeLayer(pathLayer);
+            }
+
+            pathLayer = L.geoJSON(data.geojson, {
+                style: {
+                    color: '#e74c3c',
+                    weight: 5,
+                    opacity: 0.8
+                }
+            }).addTo(map);
+
+            map.fitBounds(pathLayer.getBounds());
+            alert('Shortest driving route displayed clearly on map!');
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Error fetching the route. Please try again.');
+    });
+}
