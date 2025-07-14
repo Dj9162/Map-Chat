@@ -126,7 +126,7 @@ Deploy your Flask application easily on Render:
 
 ## 📝 License
 
-MIT License © Your Name. Feel free to use, modify, and distribute this application.
+MIT License © Dhanraj Kumar. Feel free to use, modify, and distribute this application.
 
 ---
 
